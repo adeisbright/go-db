@@ -26,12 +26,3 @@ func MySQLConnection() (*gorm.DB, *sql.DB, error) {
 	fmt.Println("Connection to Mysql DB was successful")
 	return db, sqlDb, nil
 }
-
-func Init() {
-	_, conn, err := MySQLConnection()
-	if err != nil {
-		panic(err)
-	}
-	defer conn.Close()
-
-}

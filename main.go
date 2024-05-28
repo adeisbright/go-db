@@ -11,8 +11,18 @@ import (
 
 func main() {
 	fmt.Println("Working with DBs in Golang")
+	//Initialize Configurations
 	config.Init()
+	//Use Redis
 	redis.Init()
-	controller.Run()
-	mysql.Init()
+	controller.RunRedis()
+
+	//Use MySQL
+	db, conn, err := mysql.MySQLConnection()
+	if err != nil {
+		panic(err)
+	}
+	defer conn.Close()
+	mysql.Migration(db)
+	controller.InsertMySQLRecords(db)
 }

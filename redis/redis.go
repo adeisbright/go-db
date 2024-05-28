@@ -11,40 +11,45 @@ import (
 
 type RedisFactory struct {
 	client *redis.Client
+	ctx    context.Context
 }
 
-func ConnectToRedis() *redis.Client {
-	fmt.Println(config.GetConfig().RedisURL)
+func ConnectToRedis() (*redis.Client, error) {
 	redisClient := redis.NewClient(&redis.Options{
 		Addr: config.GetConfig().RedisURL,
 	})
 
-	return redisClient
+	return redisClient, nil
 }
 
-func NewRedisFactory() *RedisFactory {
-	return &RedisFactory{
-		client: ConnectToRedis(),
+func NewRedisFactory() (*RedisFactory, error) {
+	client, err := ConnectToRedis()
+	if err != nil {
+		return nil, err
 	}
+	return &RedisFactory{
+		client,
+		context.Background(),
+	}, nil
 }
 
 // Set a new value in the redis store
 func (rf *RedisFactory) SetRedisValue(key string, value interface{}) error {
-	ctx := context.Background()
-	return rf.client.Set(ctx, key, value, 0).Err()
+	return rf.client.Set(rf.ctx, key, value, 0).Err()
 }
 func (rf *RedisFactory) GetRedisValue(key string) (*redis.StringCmd, error) {
-	ctx := context.Background()
-	return rf.client.Get(ctx, key), nil
+	return rf.client.Get(rf.ctx, key), nil
 }
 
 func (rf *RedisFactory) Ping() error {
-	ctx := context.Background()
-	return rf.client.Ping(ctx).Err()
+	return rf.client.Ping(rf.ctx).Err()
 }
 
 func Init() {
-	rf := NewRedisFactory()
+	rf, err := NewRedisFactory()
+	if err != nil {
+		log.Fatal("Cannot Connect to Redis")
+	}
 	if err := rf.Ping(); err != nil {
 		log.Fatal("Cannot Connect to Redis")
 	}
