@@ -10,12 +10,22 @@ import (
 )
 
 type Config struct {
-	RedisURL string
+	RedisURL    string
+	SqlUserName string
+	SqlPassword string
+	SqlHost     string
+	SqlDatabase string
+	SqlPort     string
 }
 
 func defaultConfig() *Config {
 	return &Config{
-		RedisURL: os.Getenv("REDIS_URL"),
+		RedisURL:    os.Getenv("REDIS_URL"),
+		SqlUserName: os.Getenv("SQL_USERNAME"),
+		SqlPassword: os.Getenv("SQL_PASSWORD"),
+		SqlHost:     os.Getenv("SQL_HOST"),
+		SqlDatabase: os.Getenv("SQL_DATABASE"),
+		SqlPort:     os.Getenv("SQL_PORT"),
 	}
 }
 
